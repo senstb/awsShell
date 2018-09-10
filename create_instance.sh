@@ -16,6 +16,11 @@ export instAmi=$(aws ec2 describe-images --owners amazon --filters 'Name=name,Va
 
 export keyName=$(aws ec2 describe-key-pairs | jq -r '.KeyPairs | sort_by(.CreationDate) | last(.[]).KeyName')
 
-export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications 'ResourceType=instance,Tags=[{Key=instance,Value= Test }]' --user-data file://startup.sh)
+if [ -f ./startup.sh ]
+then
+  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications 'ResourceType=instance,Tags=[{Key=instance,Value= Test }]' --user-data file://startup.sh)
+else
+  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications 'ResourceType=instance,Tags=[{Key=instance,Value= Test }]')
+fi
 
 echo $instance | grep PublicIpAddress
