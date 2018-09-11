@@ -3,9 +3,7 @@
 echo "Please enter name for instance: "
 read instanceName
 
-export jqVerify=$(command -v jq)
-
-if [ -z "$jqVerify" ]
+if [[ -z $(command -v jq) ]]
 then
   echo "Error in script: "
   echo "JQ application required to run script. Please review documentation for installation at https://stedolan.github.io/jq/"
