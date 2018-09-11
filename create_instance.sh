@@ -22,5 +22,3 @@ then
 else
   export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications 'ResourceType=instance,Tags=[{Key=instance,Value= Test }]')
 fi
-
-echo $instance | grep PublicIpAddress

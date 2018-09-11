@@ -14,14 +14,16 @@ else {
 }
 fi
 
+echo "Checking for stopped instances..."
 export stoppedInstanceID=$(aws ec2 describe-instances --filter "Name=instance-state-name,Values=stopped" --query 'Reservations[*].Instances[*].[InstanceId]' --output text)
 
 if [[ $stoppedInstanceID = *"None"* || -z $stoppedInstanceID ]]
 then
   echo "No stopped instances, exiting script."
 else
-  echo "Would you like to terminate these instances (Y/N)?"
+  echo "Instances found: "
   echo $stoppedInstanceID
+  echo "Would you like to terminate these instances (Y/N)?"
   read terminateAnswer
 
   if [ "$(echo "$terminateAnswer"| tr '[:upper:]' '[:lower:]')" = "y" ]
