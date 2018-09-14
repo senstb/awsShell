@@ -15,6 +15,7 @@ do {
   echo $i")" $id
 }
 done
+
 i=$(($i+1))
 echo $i") All Instances"
 echo "Which instance would you like to terminate?"
@@ -23,16 +24,15 @@ read selection
 if [ $selection -eq $i ]
 then {
   echo "Deleting all instances..."
-  #aws ec2 terminate-instances --instance-id $stoppedInstanceID
+  aws ec2 terminate-instances --instance-id $stoppedInstanceID
 }
-elif [[ $selection -lt $i ]  && [ $selection -gt 0 ]]
+elif [ $selection -lt $i -a $selection -gt 0 ]
 then {
-  echo "Selection is invalid, exiting script."
-}
-else {
-
   echo "Deleting..."
   echo ${instID[$(($selection-1))]}
-  #aws ec2 terminate-instances --instance-id ${instID[$(($selection-1))]}
+  aws ec2 terminate-instances --instance-id ${instID[$(($selection-1))]}
+}
+else {
+  echo "Selection is invalid, exiting script."
 }
 fi

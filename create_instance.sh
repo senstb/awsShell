@@ -1,6 +1,10 @@
 #!/bin/bash
 
-echo "Please enter name for instance: "
+
+echo "How many instances would you like to create?"
+read numInstances
+
+echo "Please enter name tag for instance: "
 read instanceName
 
 nameValue="ResourceType=instance,Tags=[{Key=Name,Value=$instanceName}]"
@@ -18,7 +22,7 @@ export keyName=$(aws ec2 describe-key-pairs | jq -r '.KeyPairs | sort_by(.Creati
 
 if [ -f ./startup.sh ]
 then
-  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications $nameValue --user-data file://startup.sh)
+  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --count $numInstances --tag-specifications $nameValue --user-data file://startup.sh)
 else
-  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications $nameValue)
+  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --count $numInstances --tag-specifications $nameValue)
 fi
