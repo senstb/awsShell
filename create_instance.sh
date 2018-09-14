@@ -3,6 +3,8 @@
 echo "Please enter name for instance: "
 read instanceName
 
+nameValue="ResourceType=instance,Tags=[{Key=Name,Value=$instanceName}]"
+
 if [[ -z $(command -v jq) ]]
 then
   echo "Error in script: "
@@ -16,7 +18,7 @@ export keyName=$(aws ec2 describe-key-pairs | jq -r '.KeyPairs | sort_by(.Creati
 
 if [ -f ./startup.sh ]
 then
-  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications 'ResourceType=instance,Tags=[{Key=instance,Value= Test }]' --user-data file://startup.sh)
+  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications $nameValue --user-data file://startup.sh)
 else
-  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications 'ResourceType=instance,Tags=[{Key=instance,Value= Test }]')
+  export instance=$(aws ec2 run-instances --image-id $instAmi --instance-type t2.micro --key-name $keyName --tag-specifications $nameValue)
 fi
