@@ -33,7 +33,7 @@ then
     aws iam delete-access-key --user-name $user --access-key-id $oldKey
 fi
 
-echo "Setting CLI to use new access key, ID: " $newKeyId
+echo "Updating local AWS CLI settings..."
 aws configure set aws_access_key_id $newKeyId
 aws configure set aws_secret_access_key $newSecretKey
 echo "New ID: " $newKeyId
