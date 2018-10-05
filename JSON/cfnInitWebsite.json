@@ -56,7 +56,7 @@
 
       "Default" : "0.0.0.0/0"
 
-    },
+    }
 
   },
 
@@ -98,10 +98,26 @@
 
         "InstanceType" : { "Ref" : "InstanceType" },
 
-        "SecurityGroupIds" : [{ "Ref" : "InstanceSecurityGroup" }]
-
+        "SecurityGroupIds" : [{ "Ref" : "InstanceSecurityGroup" }],
+        "Metadata" : {
+            "AWS::CloudFormation::Init" : {
+            "config" : {
+              "commands" : {
+                "update" : {
+                  "command" : "sudo yum update -y"
+                }
+              },
+              "packages" : {
+                "yum" : {
+                  "httpd" : [],
+                  "php" : [],
+                  "wordpress" : []
+                }
+              }
+            }
+          }
+        }
       }
-
     },
 
   "InstanceSecurityGroup" : {
