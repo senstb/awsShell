@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  myVPCPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      VpcId:
+        !ImportValue public-vpc
+      PeerVpcId:
+        !ImportValue private-vpc
+
+  PeeringRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock:
+        !ImportValue private-ciddr
+      RouteTableId:
+        !ImportValue public-rt
+      VpcPeeringConnectionId:
+        Ref: myVPCPeeringConnection
+
+  PeeringRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId:
+        !ImportValue private-rt
+      VpcPeeringConnectionId:
+        Ref: myVPCPeeringConnection

@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+  vpcStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.us-east-2.amazonaws.com/<bucket-name>/vpcStack.yaml
+
+  peeringConnectionStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: vpcStack
+    Properties:
+      TemplateURL: https://s3.us-east-2.amazonaws.com/<bucket-name/peeringConnectionStack.yaml

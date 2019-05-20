@@ -1,0 +1,143 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a VPC that and then creates a peering connection with an existing
+  VPC that you specify.
+Parameters:
+  myVPCIDCIDRRange:
+    Description: The IP address range for your new VPC.
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 10.1.0.0/16
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  myPrivateVPCIDCIDRRange:
+    Description: The IP address range for your new Private VPC.
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 10.0.0.0/16
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  EC2SubnetCIDRRange:
+    Description: The IP address range for a subnet in myPrivateVPC.
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 10.0.0.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  EC2PublicSubnetCIDRRange:
+    Description: The IP address range for a subnet in myVPC.
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 10.1.0.0/24
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+Resources:
+  myPrivateVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Ref: myPrivateVPCIDCIDRRange
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+  myPrivateEC2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: myPrivateVPC
+      CidrBlock:
+        Ref: EC2SubnetCIDRRange
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: myPrivateVPC
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: myPrivateEC2Subnet
+      RouteTableId:
+        Ref: RouteTable
+  myVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Ref: myVPCIDCIDRRange
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock:
+        Ref: EC2PublicSubnetCIDRRange
+      VpcId:
+        Ref: myVPC
+  myInternetGateway:
+    Type: AWS::EC2::InternetGateway
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: myVPC
+      InternetGatewayId:
+        Ref: myInternetGateway
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: myVPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: myInternetGateway
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet
+      RouteTableId:
+        Ref: PublicRouteTable
+
+Outputs:
+  vpc1:
+    Description: Public VPC ID
+    Value: !Ref myVPC
+    Export:
+      Name: public-vpc
+
+  vpc2:
+    Description: Private VPC ID
+    Value: !Ref myPrivateVPC
+    Export:
+      Name: private-vpc
+
+  purivateCIDR:
+    Description: Purivate VPC CIDR range
+    Value: !Ref myPrivateVPCIDCIDRRange
+    Export:
+      Name: private-ciddr
+
+  publicRT:
+    Description: Public Route Table
+    Value: !Ref PublicRouteTable
+    Export:
+      Name: public-rt
+
+  privateRT:
+    Description: Private Route Table
+    Value: !Ref RouteTable
+    Export:
+      Name: private-rt
