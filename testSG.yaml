@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Default SG definitions for quick CFN tests
+Parameters:
+  VpcIdParameter:
+      Description: VPC ID where to deploy
+      Type: 'AWS::SSM::Parameter::Value<String>'
+      Default: '/BAX/VPC/VPCID'
+      AllowedValues: 
+        - '/BAX/VPC/VPCID'
+        - 'Test'
+
+Resources:
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Test Group for SSM'
+      VpcId: !Ref VpcIdParameter
+      GroupName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - !Ref 'AWS::Region'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '1831'
+          ToPort: '1831'
+          CidrIp: 10.160.121.0/24
