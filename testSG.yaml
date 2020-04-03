@@ -14,7 +14,7 @@ Resources:
   SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: 'Test Group for SSM'
+      GroupDescription: 'Tersreest Group for SSM'
       VpcId: !Ref VpcIdParameter
       GroupName: !Join
         - '-'
